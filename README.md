@@ -27,7 +27,5 @@ Generate reports: Create custom reports based on specific data requirements.
 
 Contact us at info@citizen-insights.org
 
-If you have any questions or suggestions, please contact us at (Your contact information).
-
 
 
