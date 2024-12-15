@@ -11,7 +11,6 @@ Admin:
 Submit reports: Select their own reports for analysis and inclusion in the overall dataset.
 Generate reports: Create custom reports based on specific data requirements.
 
-Installation and Setup
 🚀 **Getting Started**
 
 1. Install the requirements
