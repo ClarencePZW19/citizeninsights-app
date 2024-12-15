@@ -1,10 +1,18 @@
-# 🎈 Blank app template
+# Admin Portal - Citizen Insights
 
-A simple Streamlit app template for you to modify!
+**Overview**
+This project aims to develop a web application that enables users to generate various types of reports based on data from an external datastore. The application will provide a user-friendly interface for querying data, generating reports.
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://blank-app-template.streamlit.app/)
+**Use Cases**
 
-### How to run it on your own machine
+The application will cater to the following use cases:
+
+Admin:
+Submit reports: Select their own reports for analysis and inclusion in the overall dataset.
+Generate reports: Create custom reports based on specific data requirements.
+
+Installation and Setup
+🚀 **Getting Started**
 
 1. Install the requirements
 
@@ -17,3 +25,10 @@ A simple Streamlit app template for you to modify!
    ```
    $ streamlit run streamlit_app.py
    ```
+
+Contact us at info@citizen-insights.org
+
+If you have any questions or suggestions, please contact us at (Your contact information).
+
+
+
