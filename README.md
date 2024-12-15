@@ -6,7 +6,6 @@ This project aims to develop a web application that enables users to generate va
 **Use Cases**
 
 The application will cater to the following use cases:
-
 Admin:
 Submit reports: Select their own reports for analysis and inclusion in the overall dataset.
 Generate reports: Create custom reports based on specific data requirements.
