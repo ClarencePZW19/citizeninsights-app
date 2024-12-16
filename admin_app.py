@@ -4,7 +4,7 @@ import pandas as pd
 import datasets_list
 import vertex_integration
 import webflow_integration 
-import re
+import requests
 
 # Initialize session state
 if 'json_data' not in st.session_state:
@@ -29,6 +29,7 @@ def reset_session():
     st.session_state.generated_insights = ""
     st.session_state.visualization_url = ""
     st.session_state.dataset_id = None
+    st.rerun()
 
 def display_json_data():
     if not st.session_state.json_data:
@@ -45,7 +46,7 @@ def display_json_data():
 
     try:
         dataframe = pd.DataFrame(json_data)
-        st.write("### Table displaying JSON objects as rows:")
+        st.write("### Table displaying available Datasets:")
         st.dataframe(dataframe)
     except Exception as e:
         st.error(f"Error converting JSON data to a table: {e}")
@@ -59,11 +60,26 @@ def display_json_data():
 
     st.session_state.selected_name = selected_name
 
-# Start of app code
-st.title("This is the start of our AI journey zoom zoom bam bam")
-st.write("Let's start building! Jeng Jeng")
 
-if st.button("click me to view list of blobs in cloud storage"):
+def fetch_meta_data(dataset_id):
+        url = f"https://api-production.data.gov.sg/v2/public/api/datasets/{dataset_id}/metadata"
+        response = requests.get(url)
+        
+        if response.status_code == 200:
+            metadata = response.json()
+            report_name = metadata.get('data', {}).get('name', '').lower()
+            managed_by = metadata.get('data', {}).get('managedBy', '')
+
+            return report_name, managed_by
+        else:
+            st.error("Failed to fetch metadata from data.gov.sg.")
+            return None
+
+# Start of app code
+st.title("Citizen Insights Report Generator")
+st.write("Articles will not be published unless reviewed by Admin.")
+
+if st.button("click me to view list of datasets available in Cloud"):
     try:
         st.session_state.json_data = datasets_list.download_blob()
         st.write("Data loaded")
@@ -82,7 +98,7 @@ if st.session_state.selected_name != "Please select":
                 dataset_id = selected_object['datasetId']
                 st.session_state.dataset_id = selected_object['datasetId']
                 st.write(f"Generating content for datasetID: {dataset_id}")
-
+                report_name, reporting_agency = fetch_meta_data(st.session_state.dataset_id)
                 try:
                     format = selected_object['format']
                     if format == 'XLSX':
@@ -95,7 +111,7 @@ if st.session_state.selected_name != "Please select":
                         st.error("Invalid format. Please select a valid format.")
 
                     if st.session_state.response_data is not None:
-                        model_data = vertex_integration.generate(st.session_state.response_data, st.session_state.dataset_id)
+                        model_data = vertex_integration.generate(st.session_state.response_data, st.session_state.dataset_id, report_name, reporting_agency)
                         st.session_state.generated_insights = "".join(data.text for data in model_data)
 
                 except Exception as e:
@@ -112,6 +128,7 @@ if st.session_state.generated_insights:
             selected_object = {obj["name"]: obj for obj in st.session_state.json_data}.get(st.session_state.selected_name)
             if selected_object:
                 dataset_id = selected_object['datasetId']
+                
                 try:
                     viz_data = vertex_integration.generate_visualisation(st.session_state.response_data, st.session_state.dataset_id)
                     st.session_state.visualization_url = "".join(data.text for data in viz_data)

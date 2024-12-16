@@ -94,7 +94,7 @@ def datagov_csv_request(dataset_id):
     # Return the DataFrame as a string
     return str_data
 
-def generate(document,dataset_id):
+def generate(document,dataset_id, report_name, reporting_agency):
     global data_string
     init_vertexai()
     # vertexai.init(project="winged-keyword-441104-q1", location="us-central1")
@@ -172,8 +172,8 @@ data-source-name: name of the provider of the data source. Make it data.gov.sg
 key-insight: a rich text format that will be rendered in Webflow in the following structure with each structure beginning with a H3 header text:
 Key Insight as a single paragraph summarizing the major takeaways. Make sure to be specific about what you are trying to communicate to the reader. Imagine you are a news presenter providing insight to the state of affairs.
 Small interesting points of note
-Methodology for how you performed the analysis in point form. Try to speak a little bit as to how the data was prepared. But focus more on what the specific insight you derived was and the rationalizing of that information. Try to be as comprehensive as possible so others may understand how you drew these conclusions.
-Add footnotes on things like the removal of the superscript and other processing information.
+Methodology for how you performed the analysis in point form. No need to mention the format the data was extracted in. But focus more on what the specific insight you derived was and the rationalizing of that information. Try to be as comprehensive as possible so others may understand how you drew these conclusions.
+Optionally Add footnotes on things like the removal of the superscript and other processing information if relevant.
 Ensure that the rich text format adds line breaks between sections to format it better. For Example, the Key Insight have a few empty lins before the points of note.
 This json should be readable so that I can pass it to webflow collection API. do not change the variable names cited.
 Example output: 
@@ -188,7 +188,7 @@ Example output:
 }
 Only ever give back the formatted JSON and only the JSON. This format MUST be enforced as the json will be used to parse data to another function. Note for the link, the d_ is a unique identifier for the appropriate dataset. Make sure that this is passed through
 
-""", document,dataset_id],
+""", document, report_name, reporting_agency, dataset_id],
         generation_config=generation_config,
         safety_settings=safety_settings,
         stream=True,
@@ -215,9 +215,9 @@ Geographic Data Visualizations
 Point and Polygon Map: Uses points to represent data locations on a map, often with varying sizes or colors.
 Heat Map: Shows the density of data points in a geographic area using color gradients.
 Bubble Map: Similar to point maps but uses circles of varying sizes to represent data values.
-Flow Map: Visualizes movement or flow between locations, often using arrows or lines.
+
 Numerical or Tabular Data Visualizations
-Bar Chart: Compares quantities across different categories using rectangular bars.
+Bar Chart: 
 Line Chart: Shows trends over time or continuous data using lines connecting data points.
 Scatter Plot: Displays relationships between two numerical variables using dots.
 Histogram: Represents the distribution of numerical data by showing the frequency of data intervals.
@@ -227,28 +227,32 @@ Heatmap: Represents data in a matrix form using colors to indicate values.
 Area Chart: Similar to a line chart but with the area below the line filled in to emphasize volume.
 Bubble Chart: Extends a scatter plot by adding a third variable represented by the size of the bubbles.
 Violin Plot: Combines a box plot with a kernel density plot to show data distribution.
+
 You are a data analyst. Based on the underlying dataset that you are given, determine which visualization is the appropriate one to render. Then provide back the following requirements for each visualization function
 Generate a URL for a Streamlit app that visualizes a dataset. The dataset can be either geospatial or tabular. Based on the dataset type and its columns, choose an appropriate visualization type and map the columns to the required parameters.
+
 Instructions:
 Dataset Type:
 Determine if the dataset is geospatial or tabular.
 Geospatial datasets contain geometry data such as points or polygons.
 Tabular datasets contain numerical or categorical data.
+
 Visualization Selection:
+
 For geospatial datasets:
 Use point_and_polygon_map if the dataset contains both points and polygons.
 Use heat_map for point data to show density.
 Use bubble_map to visualize point data with varying sizes.
 For tabular datasets:
-Use bar_chart for categorical comparisons.
-Use line_chart for time series data.
+Use bar_chart for categorical comparisons. Best when looking at snapshot data or data with multiple categories and axis. Compares quantities across different categories using rectangular bars.
+Use line_chart for time series data. Best when timeseries data with no additional categories 
 Use scatter_plot for relationships between two numerical variables.
-Use histogram for distribution of a single numerical variable.
-Use pie_chart for proportional data.
+Use pie_chart for proportional data. Best for percentages of a whole.
 Use box_plot for statistical summaries.
 Use area_chart for cumulative data over time.
 Use bubble_chart for three-dimensional data comparisons.
 Use violin_plot for distribution data.
+
 Parameter Mapping:
 Identify the dataset columns and map them to the visualization parameters:
 For bar_chart, line_chart, scatter_plot, etc., use x_col, y_col, and optionally category_col.
@@ -261,6 +265,7 @@ Replace placeholders with actual column headers based on the dataset provided.
 
 Example Prompt
 Input: A dataset with columns: Date, Temperature, Humidity, Location.
+
 Output:
 Dataset Type: Tabular
 Visualization Type: Line Chart (for time series)
@@ -269,10 +274,11 @@ x_col: Date
 y_col: Temperature
 category_col: Location
 Generated URL:
-https://streamlit-app-880265586889.us-central1.run.app/?datasetid=123&viz_type=line_chart&x_col=Date&y_col=Temperature&category_col=Location
-
+https://streamlit-app-880265586889.us-central1.run.app/?datasetid=d_96415fe7d30b8f82f3628602f627a4fa&viz_type=line_chart&x_col=Date&y_col=Temperature&category_col=Location
+Only include the parameter if necessary, do not include any None
+         
 Return ONLY the URL and nothing else. Do not add any commentary after. Only ever give back the formatted URL. This format MUST be enforced as the URL will be used to parse data to open the appropriate iframe.
-Keep the base url the same
+Keep the base url the same. Note the dataset_id is provided at the end of this prompt, make sure it is mapped properly.
 """, document,dataset_id],
         generation_config=generation_config,
         safety_settings=safety_settings,
